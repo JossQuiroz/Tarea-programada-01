@@ -42,7 +42,7 @@ valueBox(length(unique(cr_covid19[["recuperados"]])), icon = "pulse-outline")
 
 ```
 
-### casos fallecidos
+### Casos fallecidos
 
 ```{r}
 valueBox(length(unique(cr_covid19[["muertes"]])), icon = "pulse-outline")
