@@ -22,27 +22,27 @@ cr_covid19 <- st_read("https://raw.githubusercontent.com/geoprocesamiento-2020i/
 Row
 -----------------------------------------------------------------------
 
-### Casos activos
+### Casos Activos
 
 ```{r}
 valueBox(length(unique(cr_covid19[["activos"]])), icon = "pulse-outline")
 ```
 
-### Casos confirmados
+### Casos Confirmados
 
 ```{r}
 valueBox(length(unique(cr_covid19[["confirmados"]])), icon = "pulse-outline")
 
 ```
 
-### Casos recuperados
+### Casos Recuperados
 
 ```{r}
 valueBox(length(unique(cr_covid19[["recuperados"]])), icon = "pulse-outline")
 
 ```
 
-### casos fallecidos
+### casos Fallecidos
 
 ```{r}
 valueBox(length(unique(cr_covid19[["muertes"]])), icon = "pulse-outline")
@@ -144,14 +144,14 @@ Row {data-height=500}
 ```{r}
 
 cr_covid19 %>% 
-  select(canton, confirmados, recuperados, fallecidos=muertes) %>%
+  select(Cantón=canton, Confirmados=confirmados, Recuperados=recuperados, Fallecidos=muertes) %>%
   arrange(confirmados) %>%
   st_drop_geometry() %>%
   kable()%>%
   kable_styling() %>%
   scroll_box(
-    width = "750px", 
-    height = "600px", 
+    width = "800px", 
+    height = "500px", 
     fixed_thead = TRUE)
 
 ```
