@@ -22,27 +22,27 @@ cr_covid19 <- st_read("https://raw.githubusercontent.com/geoprocesamiento-2020i/
 Row
 -----------------------------------------------------------------------
 
-### Casos Activos
+### Casos activos
 
 ```{r}
 valueBox(length(unique(cr_covid19[["activos"]])), icon = "pulse-outline")
 ```
 
-### Casos Confirmados
+### Casos confirmados
 
 ```{r}
 valueBox(length(unique(cr_covid19[["confirmados"]])), icon = "pulse-outline")
 
 ```
 
-### Casos Recuperados
+### Casos recuperados
 
 ```{r}
 valueBox(length(unique(cr_covid19[["recuperados"]])), icon = "pulse-outline")
 
 ```
 
-### casos Fallecidos
+### casos fallecidos
 
 ```{r}
 valueBox(length(unique(cr_covid19[["muertes"]])), icon = "pulse-outline")
