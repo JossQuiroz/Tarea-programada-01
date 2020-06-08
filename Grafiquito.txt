@@ -1,0 +1,14 @@
+cr_covid19 <- st_read("https://raw.githubusercontent.com/geoprocesamiento-2020i/datos/master/covid19/casos/cr/cr-covid19-cantones.geojson")
+
+cr_confirmados.ordenado <- order(cr_covid19$confirmados, decreasing=TRUE)
+
+cr_covid19.confirmados <- cr_covid19[cr_confirmados.ordenado,]
+
+
+ggplot(cr_covid19, aes(x=reorder(provincia, -confirmados), y=confirmados)) +
+  ggtitle("Casos confirmados de Covid-19 por provincia en Costa Rica") +
+  xlab("Casos descartados") + 
+  ylab("Casos confirmados") +  
+  geom_col() +
+  geom_text(aes(label=confirmados), vjust=-0.3, size=3.5)
+

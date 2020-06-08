@@ -1,0 +1,157 @@
+---
+title: "Tablero de control con los datos de Covid19 en Costa Rica"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(sf)
+library(leaflet)
+library(knitr)
+library(kableExtra)
+library(dplyr)
+library(ggplot2)
+library(dygraphs)
+
+# Registros sobre los datos de Covid19 en Costa Rica
+cr_covid19 <- st_read("https://raw.githubusercontent.com/geoprocesamiento-2020i/datos/master/covid19/casos/cr/cr-covid19-cantones.geojson")
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Casos activos
+
+```{r}
+valueBox(length(unique(cr_covid19[["activos"]])), icon = "pulse-outline")
+```
+
+### Casos confirmados
+
+```{r}
+valueBox(length(unique(cr_covid19[["confirmados"]])), icon = "pulse-outline")
+
+```
+
+### Casos recuperados
+
+```{r}
+valueBox(length(unique(cr_covid19[["recuperados"]])), icon = "pulse-outline")
+
+```
+
+### casos fallecidos
+
+```{r}
+valueBox(length(unique(cr_covid19[["muertes"]])), icon = "pulse-outline")
+```
+
+
+Column {.sidebar data-width=500}
+-----------------------------------------------------------------------
+### Mapa de datos por cantones
+
+```{r}
+
+m <- leaflet(cr_covid19, options = leafletOptions(zoomOffset = 8))
+pal <- colorBin("Blues", cr_covid19$confirmados, bins =7, pretty = TRUE, na.color = "White")
+m %>% addPolygons(
+  fillColor = ~pal(confirmados),
+  weight = 1,
+  opacity = 2,
+  color = "black",
+  dashArray = "",
+  fillOpacity = 3,
+  popup = paste( "Cantón:",
+                   cr_covid19$canton,
+                   "<br/>",
+                   "Casos Confirmados:",
+                   cr_covid19$confirmados,
+                   "<br/>",
+                   "Casos Recuperados:",
+                   cr_covid19$recuperados,
+                   "<br/>",
+                   "Casos Fallecidos:",
+                   cr_covid19$fallecidos,
+                   "<br/>",
+                   "Casos Activos:",
+                   cr_covid19$activos,
+                   "<br/>",
+                   "<br>",
+                   "<a href='",
+                   cr_covid19$geometry))%>% 
+  addLegend(pal = pal, values = ~confirmados, opacity = 0.7, 
+            title = "Rango de casos confirmados",
+            position = "bottomright")
+
+```
+
+Row 
+-----------------------------------------------------------------------
+### Mapa de datos por provincias
+
+```{r}
+provincias <- aggregate(cr_covid19["confirmados"], by = list(cr_covid19$provincia), FUN = sum,na.rm = TRUE)
+
+muertes_act <- aggregate(cr_covid19["muertes"], by = list
+(cr_covid19$provincia), FUN = sum, na.rm = TRUE)
+
+provincias_act <- aggregate(cr_covid19["activos"], by = list(cr_covid19$provincia), FUN = sum, na.rm = TRUE)
+
+provincias_rec <- aggregate(cr_covid19["recuperados"], by = list(cr_covid19$provincia), FUN = sum, na.rm = TRUE)
+
+pal <- colorQuantile("Reds", provincias$confirmados, n = 3, na.color = "white")
+
+
+leaflet(options = leafletOptions(zoomOffset = 8)) %>%
+addPolygons(data = provincias ,
+fillColor = ~pal(confirmados),
+weight = 1,
+opacity = 1,
+color = "black",
+dashArray = "1",
+fillOpacity = 1, highlight = highlightOptions(
+weight = 1.5,
+color = "black",
+dashArray = "",
+fillOpacity = 0.9,
+bringToFront = TRUE), popup = paste("Provincia", provincias$Group.1, "Confirmados:", provincias$confirmados, "Recuperados:",provincias_rec$recuperados, "Activos:",provincias_act$activos , "Muertes:",muertes_act$muertes , sep = '<br/>')) 
+
+```
+
+### Gráfico de casos confirmados 
+
+```{r}
+
+ggplot(cr_covid19, aes(x=reorder(provincia, -confirmados), y=confirmados)) +
+  ggtitle("Casos confirmados de Covid-19 por provincia en Costa Rica") +
+  xlab("Casos por Provincia") + 
+  ylab("Casos confirmados") +  
+  geom_col() +
+  geom_text(aes(label=confirmados), vjust=-0.3, size=3.5)
+
+
+```
+
+Row {data-height=500}
+-----------------------------------------------------------------------
+
+
+### Tabla que muestra la cantidad de casos confirmados, recuperados, fallecidos en cada cantón.
+
+```{r}
+
+cr_covid19 %>% 
+  select(canton, confirmados, recuperados, fallecidos=muertes) %>%
+  arrange(confirmados) %>%
+  st_drop_geometry() %>%
+  kable()%>%
+  kable_styling() %>%
+  scroll_box(
+    width = "650px", 
+    height = "600px", 
+    fixed_thead = TRUE)
+
+```
