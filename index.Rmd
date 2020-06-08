@@ -144,14 +144,14 @@ Row {data-height=500}
 ```{r}
 
 cr_covid19 %>% 
-  select(Cantón=canton, Confirmados=confirmados, Recuperados=recuperados, Fallecidos=muertes) %>%
+  select(canton, confirmados, recuperados, fallecidos=muertes) %>%
   arrange(confirmados) %>%
   st_drop_geometry() %>%
   kable()%>%
   kable_styling() %>%
   scroll_box(
-    width = "800px", 
-    height = "500px", 
+    width = "850px", 
+    height = "800px", 
     fixed_thead = TRUE)
 
 ```
